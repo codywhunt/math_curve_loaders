@@ -114,9 +114,12 @@ class _GalleryPage extends StatelessWidget {
                           itemCount: _presets.length,
                           itemBuilder: (context, index) {
                             final preset = _presets[index];
-                            return _LoaderCard(
-                              preset: preset,
-                              onTap: () => _openPresetViewer(context, preset),
+                            return _RevealItem(
+                              index: index,
+                              child: _LoaderCard(
+                                preset: preset,
+                                onTap: () => _openPresetViewer(context, preset),
+                              ),
                             );
                           },
                         );
@@ -169,33 +172,131 @@ class _HeroHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth >= 760;
+        final copy = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _PillButton(
-              icon: isLight ? LucideIcons.moon : LucideIcons.sun,
-              label: isLight ? 'Dark' : 'Light',
-              onTap: onToggleTheme,
+            Text('MATHEMATICAL CURVE MOTION', style: tokens.eyebrow),
+            const SizedBox(height: 12),
+            Text('Math Curve Loaders', style: tokens.title),
+            const SizedBox(height: 14),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 470),
+              child: Text(
+                'A focused visual tester for parametric Flutter loading '
+                'indicators.',
+                style: tokens.body,
+              ),
             ),
           ],
-        ),
-        const SizedBox(height: 18),
-        Text('MATHEMATICAL CURVE MOTION', style: tokens.eyebrow),
-        const SizedBox(height: 10),
-        Text(
-          'A Gallery of Mathematical Loading Animations',
-          style: tokens.title,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Browse every preset, open a focused preview, tune the shared style, '
-          'and copy a Flutter snippet that mirrors the current settings.',
-          style: tokens.body,
-        ),
-      ],
+        );
+
+        final action = Align(
+          alignment: isWide ? Alignment.topRight : Alignment.centerLeft,
+          child: _PillButton(
+            icon: isLight ? LucideIcons.moon : LucideIcons.sun,
+            label: isLight ? 'Dark' : 'Light',
+            onTap: onToggleTheme,
+          ),
+        );
+
+        final visual = const _HeroVisual();
+
+        if (!isWide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              action,
+              const SizedBox(height: 28),
+              copy,
+              const SizedBox(height: 22),
+              visual,
+            ],
+          );
+        }
+
+        return SizedBox(
+          height: 330,
+          child: Stack(
+            children: [
+              Align(alignment: Alignment.topRight, child: action),
+              Align(alignment: Alignment.centerLeft, child: copy),
+              Align(alignment: Alignment.centerRight, child: visual),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _HeroVisual extends StatelessWidget {
+  const _HeroVisual();
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = _TokensScope.of(context);
+
+    return SizedBox(
+      width: 340,
+      height: 300,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: 280,
+            height: 280,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [
+                  tokens.previewGlow,
+                  tokens.background.withValues(alpha: 0),
+                ],
+                stops: const [0, 0.74],
+              ),
+            ),
+          ),
+          MathCurveLoader.fourierFlow(
+            size: 236,
+            color: tokens.heroLoader,
+            style: const MathCurveLoaderStyle(
+              particleCount: 86,
+              trailSpan: 0.44,
+              strokeWidth: 3.4,
+              guideOpacity: 0.075,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RevealItem extends StatelessWidget {
+  const _RevealItem({required this.index, required this.child});
+
+  final int index;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 360 + index * 34),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 12 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: child,
     );
   }
 }
@@ -216,7 +317,7 @@ class _LoaderCardState extends State<_LoaderCard> {
   @override
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
-    final settings = _LoaderSettings.defaults(color: widget.preset.color);
+    final settings = _LoaderSettings.defaults(color: tokens.galleryLoader);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -229,19 +330,20 @@ class _LoaderCardState extends State<_LoaderCard> {
           duration: const Duration(milliseconds: 160),
           curve: Curves.easeOut,
           transform: Matrix4.translationValues(0, _hovered ? -2 : 0, 0),
-          padding: const EdgeInsets.all(15),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: tokens.panel,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: _hovered ? tokens.borderStrong : tokens.border,
             ),
             boxShadow: [
-              BoxShadow(
-                color: tokens.shadow,
-                blurRadius: _hovered ? 48 : 36,
-                offset: const Offset(0, 24),
-              ),
+              if (_hovered)
+                BoxShadow(
+                  color: tokens.shadow,
+                  blurRadius: 28,
+                  offset: const Offset(0, 18),
+                ),
             ],
           ),
           child: Column(
@@ -295,59 +397,74 @@ class _PresetViewerState extends State<_PresetViewer> {
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
 
-    return SafeArea(
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(18),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1060),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isWide = constraints.maxWidth >= 820;
-                final preview = _ViewerPreview(
-                  preset: widget.preset,
-                  settings: _settings,
-                  onSettingsChanged: (settings) {
-                    setState(() => _settings = settings);
-                  },
-                  onReset: () {
-                    setState(() {
-                      _settings = _LoaderSettings.defaults(
-                        color: widget.preset.color,
-                      );
-                    });
-                  },
-                );
-                final code = _CodePanel(
-                  preset: widget.preset,
-                  settings: _settings,
-                );
+    return Focus(
+      autofocus: true,
+      onKeyEvent: (node, event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          Navigator.of(context).pop();
+          return KeyEventResult.handled;
+        }
+        return KeyEventResult.ignored;
+      },
+      child: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(18),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1080),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 840;
+                  final preview = _ViewerPreview(
+                    preset: widget.preset,
+                    settings: _settings,
+                    onSettingsChanged: (settings) {
+                      setState(() => _settings = settings);
+                    },
+                    onReset: () {
+                      setState(() {
+                        _settings = _LoaderSettings.defaults(
+                          color: widget.preset.color,
+                        );
+                      });
+                    },
+                  );
+                  final code = _CodePanel(
+                    preset: widget.preset,
+                    settings: _settings,
+                  );
 
-                return DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(22),
-                    boxShadow: [
-                      BoxShadow(
-                        color: tokens.shadow,
-                        blurRadius: 64,
-                        offset: const Offset(0, 30),
-                      ),
-                    ],
-                  ),
-                  child: isWide
-                      ? Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(flex: 11, child: preview),
-                            const SizedBox(width: 14),
-                            Expanded(flex: 9, child: code),
-                          ],
-                        )
-                      : Column(
-                          children: [preview, const SizedBox(height: 14), code],
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: tokens.shadow,
+                          blurRadius: 58,
+                          offset: const Offset(0, 26),
                         ),
-                );
-              },
+                      ],
+                    ),
+                    child: isWide
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 12, child: preview),
+                              const SizedBox(width: 10),
+                              Expanded(flex: 8, child: code),
+                            ],
+                          )
+                        : Column(
+                            children: [
+                              preview,
+                              const SizedBox(height: 10),
+                              code,
+                            ],
+                          ),
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -387,9 +504,11 @@ class _ViewerPreview extends StatelessWidget {
           Text(preset.title, style: tokens.modalTitle),
           const SizedBox(height: 10),
           Text(preset.description, style: tokens.body),
-          const SizedBox(height: 18),
+          const SizedBox(height: 10),
+          _FormulaNote(text: preset.formulaNote),
+          const SizedBox(height: 20),
           _SectionHeader(
-            title: 'Controls',
+            title: 'Inspector',
             action: _PillButton(
               icon: LucideIcons.rotateCcw,
               label: 'Reset',
@@ -478,26 +597,29 @@ class _ViewerPreview extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 18),
-          _SectionHeader(title: 'Formula'),
-          const SizedBox(height: 10),
-          _FormulaNote(text: preset.formulaNote),
         ],
       ),
     );
   }
 }
 
-class _CodePanel extends StatelessWidget {
+class _CodePanel extends StatefulWidget {
   const _CodePanel({required this.preset, required this.settings});
 
   final _LoaderPreset preset;
   final _LoaderSettings settings;
 
   @override
+  State<_CodePanel> createState() => _CodePanelState();
+}
+
+class _CodePanelState extends State<_CodePanel> {
+  bool _copied = false;
+
+  @override
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
-    final snippet = _snippetFor(preset, settings);
+    final snippet = _snippetFor(widget.preset, widget.settings);
 
     return _Panel(
       child: Column(
@@ -505,11 +627,19 @@ class _CodePanel extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(child: Text('Code', style: tokens.eyebrow)),
+              Expanded(child: Text('Snippet', style: tokens.eyebrow)),
               _PillButton(
-                icon: LucideIcons.copy,
-                label: 'Copy',
-                onTap: () => Clipboard.setData(ClipboardData(text: snippet)),
+                icon: _copied ? LucideIcons.check : LucideIcons.copy,
+                label: _copied ? 'Copied' : 'Copy',
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: snippet));
+                  setState(() => _copied = true);
+                  Future<void>.delayed(const Duration(milliseconds: 1400), () {
+                    if (mounted) {
+                      setState(() => _copied = false);
+                    }
+                  });
+                },
               ),
               const SizedBox(width: 8),
               _PillButton(
@@ -526,7 +656,7 @@ class _CodePanel extends StatelessWidget {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: tokens.codeBackground,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: tokens.border),
             ),
             child: SingleChildScrollView(
@@ -603,7 +733,7 @@ class _NumberControl extends StatelessWidget {
               Text('$display$suffix', style: tokens.monoValue),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 5),
           Material(
             type: MaterialType.transparency,
             child: SliderTheme(
@@ -612,9 +742,9 @@ class _NumberControl extends StatelessWidget {
                 inactiveTrackColor: tokens.borderStrong,
                 thumbColor: tokens.text,
                 overlayColor: tokens.text.withValues(alpha: 0.08),
-                trackHeight: 2,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 14),
+                trackHeight: 1.5,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 4),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
               ),
               child: Slider(
                 value: value.clamp(min, max),
@@ -646,7 +776,7 @@ class _ColorControl extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Color', style: tokens.controlLabel),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8,
             children: [
@@ -655,8 +785,8 @@ class _ColorControl extends StatelessWidget {
                   onTap: () => onChanged(color.color),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 140),
-                    width: 24,
-                    height: 24,
+                    width: 21,
+                    height: 21,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: color.color,
@@ -707,8 +837,8 @@ class _ToggleControl extends StatelessWidget {
             onTap: () => onChanged(!value),
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 160),
-              width: 46,
-              height: 26,
+              width: 40,
+              height: 22,
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(999),
@@ -719,8 +849,8 @@ class _ToggleControl extends StatelessWidget {
                 curve: Curves.easeOut,
                 alignment: value ? Alignment.centerRight : Alignment.centerLeft,
                 child: Container(
-                  width: 20,
-                  height: 20,
+                  width: 16,
+                  height: 16,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: value ? tokens.background : tokens.panel,
@@ -744,10 +874,10 @@ class _ControlShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 9),
       decoration: BoxDecoration(
         color: tokens.control,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: tokens.border),
       ),
       child: child,
@@ -781,16 +911,7 @@ class _FormulaNote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: tokens.control,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: tokens.border),
-      ),
-      child: Text(text, style: tokens.formula),
-    );
+    return Text(text, style: tokens.formula);
   }
 }
 
@@ -805,9 +926,9 @@ class _PreviewFrame extends StatelessWidget {
     final tokens = _TokensScope.of(context);
     return Container(
       width: double.infinity,
-      constraints: BoxConstraints(minHeight: large ? 318 : 178),
+      constraints: BoxConstraints(minHeight: large ? 326 : 178),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(large ? 16 : 14),
+        borderRadius: BorderRadius.circular(large ? 8 : 6),
         color: tokens.preview,
         gradient: RadialGradient(
           colors: [tokens.previewGlow, tokens.preview],
@@ -831,7 +952,7 @@ class _Panel extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: tokens.panel,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: tokens.border),
       ),
       child: child,
@@ -1214,6 +1335,8 @@ class _Tokens {
     required this.shadow,
     required this.text,
     required this.muted,
+    required this.heroLoader,
+    required this.galleryLoader,
     required this.title,
     required this.modalTitle,
     required this.cardTitle,
@@ -1272,10 +1395,14 @@ class _Tokens {
           : Colors.black.withValues(alpha: 0.42),
       text: text,
       muted: muted,
+      heroLoader: isLight ? const Color(0xFF111111) : Colors.white,
+      galleryLoader: isLight
+          ? const Color(0xFF1F1F1F)
+          : Colors.white.withValues(alpha: 0.92),
       title: TextStyle(
         color: text,
-        fontSize: 42,
-        height: 1.06,
+        fontSize: 58,
+        height: 0.96,
         fontWeight: FontWeight.w600,
         letterSpacing: 0,
       ),
@@ -1353,9 +1480,9 @@ class _Tokens {
         letterSpacing: 0,
       ),
       formula: TextStyle(
-        color: text.withValues(alpha: 0.86),
-        fontSize: 12,
-        height: 1.5,
+        color: muted,
+        fontSize: 11,
+        height: 1.45,
         fontFamily: 'SF Mono',
         letterSpacing: 0,
       ),
@@ -1375,6 +1502,8 @@ class _Tokens {
   final Color shadow;
   final Color text;
   final Color muted;
+  final Color heroLoader;
+  final Color galleryLoader;
   final TextStyle title;
   final TextStyle modalTitle;
   final TextStyle cardTitle;
