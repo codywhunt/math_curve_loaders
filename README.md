@@ -5,11 +5,12 @@ Animated Flutter loading indicators drawn from parametric mathematical curves.
 `math_curve_loaders` gives you lightweight, dependency-free loaders with a
 simple widget API and a small catalog of curve families: rose curves, Lissajous
 curves, cardioids, hypotrochoids, epicycloids, Cassini ovals, lemniscates,
-spirals, and Fourier-style flows.
+spirals, Fourier-style flows, butterflies, heart waves, astroids,
+superellipses, and torus-knot projections.
 
 ## Features
 
-- Named constructors for nine curated mathematical loader presets.
+- Named constructors for fourteen curated mathematical loader presets.
 - A `MathCurveLoader.custom` escape hatch for your own normalized curve builder.
 - Theme-aware color defaults using `ColorScheme.primary`.
 - Shared visual controls through `MathCurveLoaderStyle`.
@@ -94,6 +95,11 @@ MathCurveLoader.custom(
 - `MathCurveLoader.lemniscate`
 - `MathCurveLoader.spiral`
 - `MathCurveLoader.fourierFlow`
+- `MathCurveLoader.butterfly`
+- `MathCurveLoader.heartWave`
+- `MathCurveLoader.astroid`
+- `MathCurveLoader.superellipse`
+- `MathCurveLoader.torusKnot`
 
 ## Inspiration
 

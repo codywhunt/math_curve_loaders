@@ -18,8 +18,10 @@ class MathCurveLoader extends StatefulWidget {
     this.animate = true,
     this.reverse = false,
     this.respectReducedMotion = true,
+    bool closedPath = true,
   })  : assert(size > 0),
-        assert(duration > Duration.zero);
+        assert(duration > Duration.zero),
+        _closedPath = closedPath;
 
   /// Creates a loader from a rose curve.
   factory MathCurveLoader.rose({
@@ -322,6 +324,198 @@ class MathCurveLoader extends StatefulWidget {
     );
   }
 
+  /// Creates a loader from a butterfly-inspired curve.
+  factory MathCurveLoader.butterfly({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 9000),
+    MathCurveLoaderStyle style = const MathCurveLoaderStyle(
+      particleCount: 96,
+      trailSpan: 0.26,
+      strokeWidth: 4.2,
+    ),
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double turns = 12,
+    double scale = 4.6,
+    double pulse = 0.45,
+    double cosWeight = 2,
+    int power = 5,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.butterfly(
+        turns: turns,
+        scale: scale,
+        pulse: pulse,
+        cosWeight: cosWeight,
+        power: power,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a heart-shaped wave curve.
+  factory MathCurveLoader.heartWave({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 8400),
+    MathCurveLoaderStyle style = const MathCurveLoaderStyle(
+      particleCount: 104,
+      trailSpan: 0.18,
+      strokeWidth: 3.8,
+    ),
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double frequency = 6.4,
+    double rootSpan = 3.3,
+    double amplitude = 0.9,
+    double scaleX = 23.2,
+    double scaleY = 24.5,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.heartWave(
+        frequency: frequency,
+        rootSpan: rootSpan,
+        amplitude: amplitude,
+        scaleX: scaleX,
+        scaleY: scaleY,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+      closedPath: false,
+    );
+  }
+
+  /// Creates a loader from a four-cusped astroid curve.
+  factory MathCurveLoader.astroid({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double radius = 32,
+    double squareness = 2.6,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.astroid(
+        radius: radius,
+        squareness: squareness,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a superellipse.
+  factory MathCurveLoader.superellipse({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double width = 31,
+    double height = 26,
+    double exponent = 3.6,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.superellipse(
+        width: width,
+        height: height,
+        exponent: exponent,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a projected torus-knot-like curve.
+  factory MathCurveLoader.torusKnot({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    int p = 2,
+    int q = 3,
+    double radius = 20,
+    double tube = 8,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.torusKnot(
+        p: p,
+        q: q,
+        radius: radius,
+        tube: tube,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
   /// Creates a loader from a custom normalized 100x100 curve builder.
   factory MathCurveLoader.custom({
     Key? key,
@@ -380,6 +574,8 @@ class MathCurveLoader extends StatefulWidget {
 
   /// Whether to honor [MediaQueryData.disableAnimations].
   final bool respectReducedMotion;
+
+  final bool _closedPath;
 
   @override
   State<MathCurveLoader> createState() => _MathCurveLoaderState();
@@ -441,6 +637,7 @@ class _MathCurveLoaderState extends State<MathCurveLoader>
           curve: widget.curve,
           color: color,
           style: widget.style,
+          closedPath: widget._closedPath,
         ),
       ),
     );

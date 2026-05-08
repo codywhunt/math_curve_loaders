@@ -466,7 +466,10 @@ class _LoaderCardState extends State<_LoaderCard> {
   @override
   Widget build(BuildContext context) {
     final tokens = _TokensScope.of(context);
-    final settings = _LoaderSettings.defaults(color: tokens.galleryLoader);
+    final settings = _LoaderSettings.defaults(
+      color: tokens.galleryLoader,
+      preset: widget.preset,
+    );
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -542,6 +545,7 @@ class _PresetViewerState extends State<_PresetViewer> {
     final tokens = _TokensScope.of(context);
     final settings = _settings ??= _LoaderSettings.defaults(
       color: _defaultViewerColor(widget.preset, tokens),
+      preset: widget.preset,
     );
 
     return Focus(
@@ -581,6 +585,7 @@ class _PresetViewerState extends State<_PresetViewer> {
                       setState(() {
                         _settings = _LoaderSettings.defaults(
                           color: _defaultViewerColor(widget.preset, tokens),
+                          preset: widget.preset,
                         );
                       });
                     },
@@ -762,8 +767,8 @@ class _ControlsPanel extends StatelessWidget {
                   label: 'DURATION',
                   value: settings.durationMs.toDouble(),
                   min: 1200,
-                  max: 7200,
-                  divisions: 30,
+                  max: 10000,
+                  divisions: 44,
                   suffix: 'ms',
                   onChanged: (value) => onSettingsChanged(
                     settings.copyWith(durationMs: value.round()),
@@ -1330,6 +1335,70 @@ Widget _buildLoader(
         y2: _curveSetting(preset, settings, 'y2'),
         y4: _curveSetting(preset, settings, 'y4'),
       );
+    case 'butterfly':
+      loader = MathCurveLoader.butterfly(
+        size: loaderSize,
+        color: settings.color,
+        duration: Duration(milliseconds: settings.durationMs),
+        style: style,
+        animate: settings.animate,
+        reverse: settings.reverse,
+        turns: _curveSetting(preset, settings, 'turns'),
+        scale: _curveSetting(preset, settings, 'scale'),
+        pulse: _curveSetting(preset, settings, 'pulse'),
+        cosWeight: _curveSetting(preset, settings, 'cosWeight'),
+        power: _curveSettingInt(preset, settings, 'power'),
+      );
+    case 'heartWave':
+      loader = MathCurveLoader.heartWave(
+        size: loaderSize,
+        color: settings.color,
+        duration: Duration(milliseconds: settings.durationMs),
+        style: style,
+        animate: settings.animate,
+        reverse: settings.reverse,
+        frequency: _curveSetting(preset, settings, 'frequency'),
+        rootSpan: _curveSetting(preset, settings, 'rootSpan'),
+        amplitude: _curveSetting(preset, settings, 'amplitude'),
+        scaleX: _curveSetting(preset, settings, 'scaleX'),
+        scaleY: _curveSetting(preset, settings, 'scaleY'),
+      );
+    case 'astroid':
+      loader = MathCurveLoader.astroid(
+        size: loaderSize,
+        color: settings.color,
+        duration: Duration(milliseconds: settings.durationMs),
+        style: style,
+        animate: settings.animate,
+        reverse: settings.reverse,
+        radius: _curveSetting(preset, settings, 'radius'),
+        squareness: _curveSetting(preset, settings, 'squareness'),
+      );
+    case 'superellipse':
+      loader = MathCurveLoader.superellipse(
+        size: loaderSize,
+        color: settings.color,
+        duration: Duration(milliseconds: settings.durationMs),
+        style: style,
+        animate: settings.animate,
+        reverse: settings.reverse,
+        width: _curveSetting(preset, settings, 'width'),
+        height: _curveSetting(preset, settings, 'height'),
+        exponent: _curveSetting(preset, settings, 'exponent'),
+      );
+    case 'torusKnot':
+      loader = MathCurveLoader.torusKnot(
+        size: loaderSize,
+        color: settings.color,
+        duration: Duration(milliseconds: settings.durationMs),
+        style: style,
+        animate: settings.animate,
+        reverse: settings.reverse,
+        p: _curveSettingInt(preset, settings, 'p'),
+        q: _curveSettingInt(preset, settings, 'q'),
+        radius: _curveSetting(preset, settings, 'radius'),
+        tube: _curveSetting(preset, settings, 'tube'),
+      );
     default:
       loader = MathCurveLoader.rose(
         size: loaderSize,
@@ -1416,14 +1485,17 @@ class _LoaderSettings {
     required this.curveValues,
   });
 
-  factory _LoaderSettings.defaults({required Color color}) {
+  factory _LoaderSettings.defaults({
+    required Color color,
+    _LoaderPreset? preset,
+  }) {
     return _LoaderSettings(
       size: 168,
-      durationMs: 4600,
+      durationMs: preset?.durationMs ?? 4600,
       color: color,
-      particleCount: 64,
-      trailSpan: 0.38,
-      strokeWidth: 4.0,
+      particleCount: preset?.particleCount ?? 64,
+      trailSpan: preset?.trailSpan ?? 0.38,
+      strokeWidth: preset?.strokeWidth ?? 4.0,
       animate: true,
       reverse: false,
       reducedMotion: false,
@@ -1508,6 +1580,10 @@ class _LoaderPreset {
     required this.formulaNote,
     required this.color,
     required this.curveControls,
+    this.durationMs,
+    this.particleCount,
+    this.trailSpan,
+    this.strokeWidth,
   });
 
   final String id;
@@ -1517,6 +1593,10 @@ class _LoaderPreset {
   final String formulaNote;
   final Color color;
   final List<_CurveControl> curveControls;
+  final int? durationMs;
+  final int? particleCount;
+  final double? trailSpan;
+  final double? strokeWidth;
 }
 
 class _Swatch {
@@ -1848,6 +1928,236 @@ const _presets = [
         min: 0,
         max: 9,
         divisions: 36,
+      ),
+    ],
+  ),
+  _LoaderPreset(
+    id: 'butterfly',
+    title: 'Butterfly',
+    tag: 'WINGS',
+    description: 'A classic butterfly curve with layered mirrored wing lobes.',
+    formulaNote:
+        'The butterfly equation combines exp(cos u), cos 4u, and sin(u / 12).',
+    color: Color(0xFFC4A5FF),
+    durationMs: 9000,
+    particleCount: 96,
+    trailSpan: 0.26,
+    strokeWidth: 4.2,
+    curveControls: [
+      _CurveControl(
+        key: 'turns',
+        label: 'TURNS',
+        defaultValue: 12,
+        min: 6,
+        max: 18,
+        divisions: 24,
+        precision: 1,
+      ),
+      _CurveControl(
+        key: 'scale',
+        label: 'SCALE',
+        defaultValue: 4.6,
+        min: 2.5,
+        max: 7,
+        divisions: 90,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'pulse',
+        label: 'PULSE',
+        defaultValue: 0.45,
+        min: 0,
+        max: 1.2,
+        divisions: 60,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'cosWeight',
+        label: 'COS WEIGHT',
+        defaultValue: 2,
+        min: 0.5,
+        max: 4,
+        divisions: 70,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'power',
+        label: 'POWER',
+        defaultValue: 5,
+        min: 2,
+        max: 8,
+        divisions: 6,
+        precision: 0,
+        isInteger: true,
+      ),
+    ],
+  ),
+  _LoaderPreset(
+    id: 'heartWave',
+    title: 'Heart Wave',
+    tag: 'HEART',
+    description:
+        'An explicit heart-wave curve with adjustable interior ripples.',
+    formulaNote:
+        'An x^(2/3) envelope combines with a sine wave under a square-root span.',
+    color: Color(0xFFFF7A90),
+    durationMs: 8400,
+    particleCount: 104,
+    trailSpan: 0.18,
+    strokeWidth: 3.8,
+    curveControls: [
+      _CurveControl(
+        key: 'frequency',
+        label: 'FREQ',
+        defaultValue: 6.4,
+        min: 2,
+        max: 12,
+        divisions: 100,
+        precision: 1,
+      ),
+      _CurveControl(
+        key: 'rootSpan',
+        label: 'ROOT SPAN',
+        defaultValue: 3.3,
+        min: 2.2,
+        max: 4.2,
+        divisions: 40,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'amplitude',
+        label: 'AMP',
+        defaultValue: 0.9,
+        min: 0.3,
+        max: 1.6,
+        divisions: 26,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'scaleX',
+        label: 'X SCALE',
+        defaultValue: 23.2,
+        min: 14,
+        max: 30,
+        divisions: 80,
+        precision: 1,
+      ),
+      _CurveControl(
+        key: 'scaleY',
+        label: 'Y SCALE',
+        defaultValue: 24.5,
+        min: 14,
+        max: 34,
+        divisions: 100,
+        precision: 1,
+      ),
+    ],
+  ),
+  _LoaderPreset(
+    id: 'astroid',
+    title: 'Astroid',
+    tag: 'CUSPS',
+    description: 'A precise four-cusped curve with a soft breathing edge.',
+    formulaNote: 'An astroid uses powered sine and cosine coordinates.',
+    color: Color(0xFFA7F46A),
+    curveControls: [
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 32,
+        min: 22,
+        max: 38,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'squareness',
+        label: 'POWER',
+        defaultValue: 2.6,
+        min: 1.8,
+        max: 4,
+        divisions: 44,
+        precision: 2,
+      ),
+    ],
+  ),
+  _LoaderPreset(
+    id: 'superellipse',
+    title: 'Superellipse',
+    tag: 'SQUIRCLE',
+    description: 'A squircle-like loop that can soften toward an ellipse.',
+    formulaNote: 'A smooth superellipse approximation inflates the diagonals.',
+    color: _paperColor,
+    curveControls: [
+      _CurveControl(
+        key: 'width',
+        label: 'WIDTH',
+        defaultValue: 31,
+        min: 22,
+        max: 36,
+        divisions: 36,
+      ),
+      _CurveControl(
+        key: 'height',
+        label: 'HEIGHT',
+        defaultValue: 26,
+        min: 18,
+        max: 32,
+        divisions: 36,
+      ),
+      _CurveControl(
+        key: 'exponent',
+        label: 'EXPONENT',
+        defaultValue: 3.6,
+        min: 1.4,
+        max: 6,
+        divisions: 46,
+        precision: 2,
+      ),
+    ],
+  ),
+  _LoaderPreset(
+    id: 'torusKnot',
+    title: 'Torus Knot',
+    tag: 'KNOT',
+    description: 'A projected knot loop with a dense woven rhythm.',
+    formulaNote: 'A torus-knot projection combines major and tube cycles.',
+    color: Color(0xFF67E8F9),
+    curveControls: [
+      _CurveControl(
+        key: 'p',
+        label: 'P',
+        defaultValue: 2,
+        min: 1,
+        max: 5,
+        divisions: 4,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'q',
+        label: 'Q',
+        defaultValue: 3,
+        min: 2,
+        max: 7,
+        divisions: 5,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 20,
+        min: 12,
+        max: 28,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'tube',
+        label: 'TUBE',
+        defaultValue: 8,
+        min: 2,
+        max: 14,
+        divisions: 24,
       ),
     ],
   ),

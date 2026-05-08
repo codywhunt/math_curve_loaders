@@ -11,15 +11,17 @@ class MathCurvePainter extends CustomPainter {
     required this.curve,
     required this.color,
     required this.style,
+    required this.closedPath,
   }) : super(repaint: progress);
 
-  static const _pathSamples = 420;
+  static const _pathSamples = 720;
   static const _staticProgress = 0.18;
 
   final Animation<double> progress;
   final MathCurvePointBuilder curve;
   final Color color;
   final MathCurveLoaderStyle style;
+  final bool closedPath;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -55,7 +57,14 @@ class MathCurvePainter extends CustomPainter {
 
     for (var index = 0; index < style.particleCount; index++) {
       final tailOffset = index / (style.particleCount - 1);
-      final trailProgress = _normalize(value - tailOffset * style.trailSpan);
+      final trailProgress = closedPath
+          ? _normalize(value - tailOffset * style.trailSpan)
+          : _openTrailProgress(value, tailOffset * style.trailSpan);
+
+      if (trailProgress == null) {
+        continue;
+      }
+
       final fade = math.pow(1 - tailOffset, 0.56).toDouble();
       final point = mapPoint(curve(trailProgress, detailScale));
       final opacity = _lerp(
@@ -82,7 +91,8 @@ class MathCurvePainter extends CustomPainter {
     return oldDelegate.progress != progress ||
         oldDelegate.curve != curve ||
         oldDelegate.color != color ||
-        oldDelegate.style != style;
+        oldDelegate.style != style ||
+        oldDelegate.closedPath != closedPath;
   }
 
   static double _staticValue(bool reverse) =>
@@ -100,4 +110,15 @@ class MathCurvePainter extends CustomPainter {
   double _lerp(double begin, double end, double t) => begin + (end - begin) * t;
 
   double _normalize(double progress) => ((progress % 1) + 1) % 1;
+
+  double? _openTrailProgress(double value, double tailOffset) {
+    final cycle = (value * 2) % 2;
+    if (cycle <= 1) {
+      final trailProgress = cycle - tailOffset;
+      return trailProgress >= 0 ? trailProgress : null;
+    }
+
+    final trailProgress = 2 - cycle + tailOffset;
+    return trailProgress <= 1 ? trailProgress : null;
+  }
 }

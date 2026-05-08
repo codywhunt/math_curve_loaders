@@ -17,6 +17,11 @@ void main() {
       'lemniscate': () => MathCurveLoader.lemniscate(),
       'spiral': () => MathCurveLoader.spiral(),
       'fourierFlow': () => MathCurveLoader.fourierFlow(),
+      'butterfly': () => MathCurveLoader.butterfly(),
+      'heartWave': () => MathCurveLoader.heartWave(),
+      'astroid': () => MathCurveLoader.astroid(),
+      'superellipse': () => MathCurveLoader.superellipse(),
+      'torusKnot': () => MathCurveLoader.torusKnot(),
     };
 
     for (final entry in presets.entries) {
@@ -131,6 +136,11 @@ void main() {
       'lemniscate': MathLoaderCurves.lemniscate(),
       'spiral': MathLoaderCurves.spiral(),
       'fourierFlow': MathLoaderCurves.fourierFlow(),
+      'butterfly': MathLoaderCurves.butterfly(),
+      'heartWave': MathLoaderCurves.heartWave(),
+      'astroid': MathLoaderCurves.astroid(),
+      'superellipse': MathLoaderCurves.superellipse(),
+      'torusKnot': MathLoaderCurves.torusKnot(),
     };
 
     for (final entry in curves.entries) {
@@ -158,6 +168,10 @@ void main() {
       'lemniscate': MathLoaderCurves.lemniscate(),
       'spiral': MathLoaderCurves.spiral(),
       'fourierFlow': MathLoaderCurves.fourierFlow(),
+      'butterfly': MathLoaderCurves.butterfly(),
+      'astroid': MathLoaderCurves.astroid(),
+      'superellipse': MathLoaderCurves.superellipse(),
+      'torusKnot': MathLoaderCurves.torusKnot(),
     };
 
     for (final entry in curves.entries) {

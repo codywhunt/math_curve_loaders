@@ -192,4 +192,135 @@ class MathLoaderCurves {
       return Offset(50 + x, 50 + y);
     };
   }
+
+  /// A compact butterfly-inspired curve with wing-like lobes.
+  static MathCurvePointBuilder butterfly({
+    double turns = 12,
+    double scale = 4.6,
+    double pulse = 0.45,
+    double cosWeight = 2,
+    int power = 5,
+  }) {
+    assert(turns > 0);
+    assert(scale > 0);
+    assert(pulse >= 0);
+    assert(cosWeight >= 0);
+    assert(power > 0);
+
+    return (progress, detailScale) {
+      final t = progress * math.pi * turns;
+      final envelope = math.exp(math.cos(t)) -
+          cosWeight * math.cos(4 * t) -
+          math.pow(math.sin(t / 12), power).toDouble();
+      final animatedScale = scale + detailScale * pulse;
+
+      return Offset(
+        50 + math.sin(t) * envelope * animatedScale,
+        50 + math.cos(t) * envelope * animatedScale,
+      );
+    };
+  }
+
+  /// A heart-shaped wave drawn from an explicit x/y curve.
+  static MathCurvePointBuilder heartWave({
+    double frequency = 6.4,
+    double rootSpan = 3.3,
+    double amplitude = 0.9,
+    double scaleX = 23.2,
+    double scaleY = 24.5,
+  }) {
+    assert(frequency > 0);
+    assert(rootSpan > 0);
+    assert(amplitude >= 0);
+    assert(scaleX > 0);
+    assert(scaleY > 0);
+
+    return (progress, detailScale) {
+      final limit = math.sqrt(rootSpan);
+      final x = -limit + progress * limit * 2;
+      final safeRoot = math.max(0.0, rootSpan - x * x);
+      final wave =
+          amplitude * math.sqrt(safeRoot) * math.sin(frequency * math.pi * x);
+      final envelope = math.pow(x.abs(), 2 / 3).toDouble();
+      final y = envelope + wave;
+
+      return Offset(
+        50 + x * scaleX,
+        18 + (1.75 - y) * (scaleY + detailScale * 1.5),
+      );
+    };
+  }
+
+  /// A four-cusped astroid curve.
+  static MathCurvePointBuilder astroid({
+    double radius = 32,
+    double squareness = 2.6,
+  }) {
+    assert(radius > 0);
+    assert(squareness > 0);
+
+    return (progress, detailScale) {
+      final t = progress * math.pi * 2;
+      final pulse = 0.9 + detailScale * 0.12;
+      final x = _signedPow(math.cos(t), squareness);
+      final y = _signedPow(math.sin(t), squareness);
+
+      return Offset(50 + x * radius * pulse, 50 + y * radius * pulse);
+    };
+  }
+
+  /// A superellipse that can move between diamond, ellipse, and squircle.
+  static MathCurvePointBuilder superellipse({
+    double width = 31,
+    double height = 26,
+    double exponent = 3.6,
+  }) {
+    assert(width > 0);
+    assert(height > 0);
+    assert(exponent > 0);
+
+    return (progress, detailScale) {
+      final t = progress * math.pi * 2;
+      final roundness = ((exponent - 1) / 7).clamp(0.0, 1.0);
+      final pulse = 0.9 + detailScale * 0.12;
+      final diagonalInflation = 1 + roundness * 0.22 * _squaredSin(2 * t);
+      final x = math.cos(t) * diagonalInflation;
+      final y = math.sin(t) * diagonalInflation;
+
+      return Offset(50 + x * width * pulse, 50 + y * height * pulse);
+    };
+  }
+
+  /// A 2D projection of a torus-knot-like loop.
+  static MathCurvePointBuilder torusKnot({
+    int p = 2,
+    int q = 3,
+    double radius = 20,
+    double tube = 8,
+  }) {
+    assert(p > 0);
+    assert(q > 0);
+    assert(radius > 0);
+    assert(tube >= 0);
+
+    return (progress, detailScale) {
+      final t = progress * math.pi * 2;
+      final pulse = 0.88 + detailScale * 0.16;
+      final r = radius + tube * math.cos(q * t);
+      final x = r * math.cos(p * t);
+      final y = r * math.sin(p * t) + tube * math.sin(q * t) * 0.72;
+
+      return Offset(50 + x * pulse, 50 + y * pulse);
+    };
+  }
+
+  static double _signedPow(double value, double exponent) {
+    final sign = value < 0 ? -1 : 1;
+    return sign * math.pow(value.abs(), exponent).toDouble();
+  }
+
+  static double _squaredSin(double value) {
+    final sine = math.sin(value);
+    return sine * sine;
+  }
 }
