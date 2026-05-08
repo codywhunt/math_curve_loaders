@@ -517,6 +517,9 @@ class MathCurveLoader extends StatefulWidget {
   }
 
   /// Creates a loader from a custom normalized 100x100 curve builder.
+  ///
+  /// Set [closedPath] to false for open curves that should sweep back and
+  /// forth instead of wrapping the trail from the end back to the beginning.
   factory MathCurveLoader.custom({
     Key? key,
     required MathCurvePointBuilder curve,
@@ -529,6 +532,7 @@ class MathCurveLoader extends StatefulWidget {
     bool animate = true,
     bool reverse = false,
     bool respectReducedMotion = true,
+    bool closedPath = true,
   }) {
     return MathCurveLoader._(
       key: key,
@@ -542,6 +546,7 @@ class MathCurveLoader extends StatefulWidget {
       animate: animate,
       reverse: reverse,
       respectReducedMotion: respectReducedMotion,
+      closedPath: closedPath,
     );
   }
 

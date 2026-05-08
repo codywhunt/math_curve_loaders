@@ -6,5 +6,6 @@
   the reference gallery.
 - Added `MathCurveLoaderStyle` for shared visual customization.
 - Added custom curve support through `MathCurveLoader.custom`.
+- Added open-path support for custom curve loaders.
 - Added reduced-motion handling and progress semantics.
 - Updated package metadata, README, and license for the first private release.

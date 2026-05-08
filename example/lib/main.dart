@@ -303,7 +303,7 @@ class _HeroHeader extends StatelessWidget {
         final body = ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 380),
           child: Text(
-            'Nine parametric Flutter loading indicators - fully customizable. '
+            'Fifteen Flutter loading indicators - fully customizable. '
             'Each tunable in real time. ',
             style: tokens.body,
           ),
@@ -1399,6 +1399,11 @@ Widget _buildLoader(
         radius: _curveSetting(preset, settings, 'radius'),
         tube: _curveSetting(preset, settings, 'tube'),
       );
+    case 'flutterflowLogo':
+      loader = _buildFlutterflowLogoLoader(
+        size: loaderSize,
+        settings: settings,
+      );
     default:
       loader = MathCurveLoader.rose(
         size: loaderSize,
@@ -1416,9 +1421,285 @@ Widget _buildLoader(
   );
 }
 
+Widget _buildFlutterflowLogoLoader({
+  required double size,
+  required _LoaderSettings settings,
+}) {
+  final innerColor = Color.lerp(settings.color, const Color(0xFF67E8F9), 0.45)!;
+  final outlineStyle = MathCurveLoaderStyle(
+    particleCount: settings.particleCount,
+    trailSpan: settings.trailSpan,
+    strokeWidth: settings.strokeWidth,
+    guideOpacity: 0.10,
+    minParticleOpacity: 0.03,
+    maxParticleOpacity: 0.90,
+    minParticleRadius: 0.55,
+    maxParticleRadius: 2.65,
+  );
+
+  return SizedBox.square(
+    dimension: size,
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        MathCurveLoader.custom(
+          curve: _flutterflowLogoCurve.call,
+          size: size,
+          color: settings.color,
+          animate: false,
+          style: MathCurveLoaderStyle(
+            particleCount: 2,
+            trailSpan: 0.12,
+            strokeWidth: settings.strokeWidth * 0.76,
+            guideOpacity: 0.12,
+            minParticleOpacity: 0,
+            maxParticleOpacity: 0,
+            minParticleRadius: 0.1,
+            maxParticleRadius: 0.1,
+          ),
+        ),
+        for (final curve in _flutterflowLogoInnerCurves)
+          MathCurveLoader.custom(
+            curve: curve.call,
+            size: size,
+            color: innerColor,
+            animate: false,
+            style: MathCurveLoaderStyle(
+              particleCount: 2,
+              trailSpan: 0.12,
+              strokeWidth: settings.strokeWidth * 0.28,
+              guideOpacity: 0.20,
+              minParticleOpacity: 0,
+              maxParticleOpacity: 0,
+              minParticleRadius: 0.1,
+              maxParticleRadius: 0.1,
+            ),
+          ),
+        for (final curve in _flutterflowLogoAnimatedInnerCurves)
+          MathCurveLoader.custom(
+            curve: curve.call,
+            size: size,
+            color: innerColor,
+            duration: Duration(milliseconds: settings.durationMs + 1800),
+            style: MathCurveLoaderStyle(
+              particleCount: (settings.particleCount * 0.28).round(),
+              trailSpan: 0.22,
+              strokeWidth: settings.strokeWidth * 0.30,
+              guideOpacity: 0.03,
+              minParticleOpacity: 0.02,
+              maxParticleOpacity: 0.34,
+              minParticleRadius: 0.28,
+              maxParticleRadius: 1.25,
+            ),
+            animate: settings.animate,
+            reverse: !settings.reverse,
+          ),
+        MathCurveLoader.custom(
+          curve: _flutterflowLogoCurve.call,
+          size: size,
+          color: settings.color,
+          duration: Duration(milliseconds: settings.durationMs),
+          style: outlineStyle,
+          animate: settings.animate,
+          reverse: settings.reverse,
+        ),
+      ],
+    ),
+  );
+}
+
+final _flutterflowLogoCurve = _PolylineCurve(const [
+  Offset(26.0, 82.8),
+  Offset(24.0, 81.1),
+  Offset(18.7, 70.3),
+  Offset(18.7, 67.5),
+  Offset(19.5, 65.0),
+  Offset(26.9, 51.2),
+  Offset(20.9, 37.5),
+  Offset(20.8, 35.0),
+  Offset(21.7, 32.9),
+  Offset(30.0, 19.6),
+  Offset(32.2, 17.8),
+  Offset(34.6, 17.0),
+  Offset(77.0, 17.0),
+  Offset(79.0, 17.1),
+  Offset(81.0, 18.0),
+  Offset(82.1, 19.8),
+  Offset(82.2, 22.2),
+  Offset(81.6, 25.2),
+  Offset(73.3, 39.2),
+  Offset(70.8, 41.1),
+  Offset(68.7, 41.7),
+  Offset(59.2, 41.7),
+  Offset(63.2, 50.8),
+  Offset(63.4, 53.6),
+  Offset(62.6, 56.3),
+  Offset(54.7, 70.3),
+  Offset(52.6, 72.1),
+  Offset(50.2, 72.9),
+  Offset(38.5, 72.9),
+  Offset(30.1, 81.8),
+  Offset(28.0, 83.0),
+  Offset(26.0, 82.8),
+]);
+
+final _flutterflowLogoTopRightCutout = _PolylineCurve(const [
+  Offset(76.9, 20.9),
+  Offset(50.0, 20.9),
+  Offset(57.3, 37.8),
+  Offset(68.6, 37.8),
+  Offset(69.8, 37.1),
+  Offset(78.2, 23.1),
+  Offset(78.4, 21.8),
+  Offset(76.9, 20.9),
+]);
+
+final _flutterflowLogoTopLeftCutout = _PolylineCurve(const [
+  Offset(45.9, 20.9),
+  Offset(34.6, 20.9),
+  Offset(33.4, 21.6),
+  Offset(25.1, 35.6),
+  Offset(25.0, 36.9),
+  Offset(26.4, 37.8),
+  Offset(53.2, 37.8),
+  Offset(45.9, 20.9),
+]);
+
+final _flutterflowLogoMiddleCutout = _PolylineCurve(const [
+  Offset(27.1, 41.8),
+  Offset(30.0, 48.5),
+  Offset(31.6, 48.2),
+  Offset(57.8, 48.2),
+  Offset(55.0, 41.8),
+  Offset(27.1, 41.8),
+]);
+
+final _flutterflowLogoLowerCutout = _PolylineCurve(const [
+  Offset(58.5, 52.0),
+  Offset(31.6, 52.0),
+  Offset(31.5, 52.1),
+  Offset(38.9, 68.9),
+  Offset(50.2, 68.9),
+  Offset(51.4, 68.2),
+  Offset(59.8, 54.2),
+  Offset(60.0, 52.9),
+  Offset(58.5, 52.0),
+]);
+
+final _flutterflowLogoLowerLeftCutout = _PolylineCurve(const [
+  Offset(28.9, 55.5),
+  Offset(22.2, 66.7),
+  Offset(22.2, 68.1),
+  Offset(23.4, 68.9),
+  Offset(34.7, 68.9),
+  Offset(28.9, 55.5),
+]);
+
+final _flutterflowLogoNotchCutout = _PolylineCurve(const [
+  Offset(33.1, 72.8),
+  Offset(24.2, 72.8),
+  Offset(26.8, 78.8),
+  Offset(27.3, 79.0),
+  Offset(33.1, 72.8),
+]);
+
+final _flutterflowLogoInnerCurves = [
+  _flutterflowLogoTopLeftCutout,
+  _flutterflowLogoTopRightCutout,
+  _flutterflowLogoMiddleCutout,
+  _flutterflowLogoLowerCutout,
+  _flutterflowLogoLowerLeftCutout,
+  _flutterflowLogoNotchCutout,
+];
+
+final _flutterflowLogoAnimatedInnerCurves = [
+  _flutterflowLogoTopRightCutout,
+  _flutterflowLogoLowerCutout,
+];
+
+class _PolylineCurve {
+  _PolylineCurve(this.points)
+    : assert(points.length > 1),
+      _segments = _buildSegments(points),
+      _length = _measure(points);
+
+  final List<Offset> points;
+  final List<double> _segments;
+  final double _length;
+
+  Offset call(double progress, double detailScale) {
+    final normalizedProgress = progress.clamp(0.0, 1.0).toDouble();
+    final target = normalizedProgress * _length;
+    var distance = 0.0;
+
+    for (var index = 0; index < _segments.length; index++) {
+      final segment = _segments[index];
+      if (distance + segment >= target) {
+        final local = segment == 0 ? 0.0 : (target - distance) / segment;
+        final point = Offset.lerp(points[index], points[index + 1], local)!;
+        return _pulseAroundCenter(point, detailScale);
+      }
+      distance += segment;
+    }
+
+    return _pulseAroundCenter(points.last, detailScale);
+  }
+
+  static List<double> _buildSegments(List<Offset> points) {
+    return [
+      for (var index = 0; index < points.length - 1; index++)
+        (points[index + 1] - points[index]).distance,
+    ];
+  }
+
+  static double _measure(List<Offset> points) {
+    return _buildSegments(points).fold(0, (total, segment) => total + segment);
+  }
+
+  static Offset _pulseAroundCenter(Offset point, double detailScale) {
+    final pulse = 0.985 + detailScale * 0.03;
+    const center = Offset(50, 50);
+    return center + (point - center) * pulse;
+  }
+}
+
 String _snippetFor(_LoaderPreset preset, _LoaderSettings settings) {
   final colorName = _colorName(settings.color);
   final curveLines = _curveSnippetLines(preset, settings);
+  if (preset.id == 'flutterflowLogo') {
+    return '''
+Stack(
+  alignment: Alignment.center,
+  children: [
+    MathCurveLoader.custom(
+      curve: flutterflowLogoTopRightCutout,
+      size: ${settings.size.round()},
+      color: const Color(0xFF67E8F9),
+      duration: const Duration(milliseconds: ${settings.durationMs + 1600}),
+      reverse: ${!settings.reverse},
+      style: const MathCurveLoaderStyle(
+        particleCount: ${(settings.particleCount * 0.46).round()},
+        trailSpan: 0.13,
+        strokeWidth: ${(settings.strokeWidth * 0.38).toStringAsFixed(1)},
+      ),
+    ),
+    MathCurveLoader.custom(
+      curve: flutterflowLogoCurve,
+      size: ${settings.size.round()},
+      color: $colorName,
+      duration: const Duration(milliseconds: ${settings.durationMs}),
+      style: const MathCurveLoaderStyle(
+        particleCount: ${settings.particleCount},
+        trailSpan: ${settings.trailSpan.toStringAsFixed(2)},
+        strokeWidth: ${settings.strokeWidth.toStringAsFixed(1)},
+      ),
+      animate: ${settings.animate},
+      reverse: ${settings.reverse},
+    ),
+  ],
+)''';
+  }
+
   return '''
 MathCurveLoader.${preset.id}(
   size: ${settings.size.round()},
@@ -2160,6 +2441,20 @@ const _presets = [
         divisions: 24,
       ),
     ],
+  ),
+  _LoaderPreset(
+    id: 'flutterflowLogo',
+    title: 'FF Logo',
+    tag: 'CUSTOM',
+    description: 'Layered custom loaders trace the silhouette and inner folds.',
+    formulaNote:
+        'Stacked sampled polylines show outline and internal SVG structure.',
+    color: _inkColor,
+    durationMs: 6200,
+    particleCount: 92,
+    trailSpan: 0.22,
+    strokeWidth: 4.2,
+    curveControls: [],
   ),
 ];
 
