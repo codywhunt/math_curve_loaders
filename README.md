@@ -6,12 +6,13 @@ Animated Flutter loading indicators drawn from parametric mathematical curves.
 simple widget API and a small catalog of curve families: rose curves, Lissajous
 curves, cardioids, hypotrochoids, epicycloids, Cassini ovals, lemniscates,
 spirals, Fourier-style flows, butterflies, heart waves, astroids,
-superellipses, and torus-knot projections.
+superellipses, torus-knot projections, and custom paths.
 
 ## Features
 
 - Named constructors for fourteen curated mathematical loader presets.
-- A `MathCurveLoader.custom` escape hatch for your own normalized curve builder.
+- A `MathCurveLoader.custom` escape hatch for your own normalized curve builder,
+  including open paths.
 - Theme-aware color defaults using `ColorScheme.primary`.
 - Shared visual controls through `MathCurveLoaderStyle`.
 - Reduced-motion support through `MediaQuery.disableAnimations`.
@@ -22,14 +23,9 @@ superellipses, and torus-knot projections.
 
 Add the package to your app:
 
-```yaml
-dependencies:
-  math_curve_loaders:
-    git:
-      url: https://github.com/codywhunt/math_curve_loaders.git
+```sh
+flutter pub add math_curve_loaders
 ```
-
-The repository is private while the package is being prepared for pub.dev.
 
 ## Usage
 
@@ -84,6 +80,37 @@ MathCurveLoader.custom(
 )
 ```
 
+For open paths, set `closedPath` to `false` so the trail sweeps back and forth
+instead of wrapping from the end of the path back to the beginning:
+
+```dart
+MathCurveLoader.custom(
+  closedPath: false,
+  curve: (progress, detailScale) {
+    final x = 18 + progress * 64;
+    final y = 50 + math.sin(progress * math.pi * 3) * 18;
+    return Offset(x, y);
+  },
+)
+```
+
+You can also layer multiple custom loaders with `Stack` to draw more complex
+marks, such as a faint static guide underneath a moving trail:
+
+```dart
+Stack(
+  alignment: Alignment.center,
+  children: [
+    MathCurveLoader.custom(
+      curve: logoOutline,
+      animate: false,
+      style: const MathCurveLoaderStyle(guideOpacity: 0.12),
+    ),
+    MathCurveLoader.custom(curve: logoOutline),
+  ],
+)
+```
+
 ## Presets
 
 - `MathCurveLoader.rose`
@@ -104,5 +131,4 @@ MathCurveLoader.custom(
 ## Inspiration
 
 This package is a clean-room Flutter implementation inspired by the idea of
-mathematical curve loading animations. It does not copy code or assets from the
-reference gallery.
+mathematical curve loading animations by PAIDAX01.

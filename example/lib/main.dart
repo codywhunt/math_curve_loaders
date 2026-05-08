@@ -1,11 +1,19 @@
+import 'dart:async';
+
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:math_curve_loaders/math_curve_loaders.dart';
 
+import 'src/external_link_launcher.dart';
+
 void main() {
   runApp(const MathCurveExampleApp());
 }
+
+const _githubUrl = 'https://github.com/codywhunt/math_curve_loaders';
+const _twitterUrl = 'https://x.com/codywilliamio';
 
 class MathCurveExampleApp extends StatefulWidget {
   const MathCurveExampleApp({super.key});
@@ -229,13 +237,24 @@ class _TopBar extends StatelessWidget {
     final tokens = _TokensScope.of(context);
     return Row(
       children: [
-        Text('M·C·L', style: tokens.wordmark),
+        Text('Math Curve Loaders', style: tokens.wordmark),
         const SizedBox(width: 14),
         Container(width: 1, height: 14, color: tokens.border),
         const SizedBox(width: 14),
-        Text('VOL.01', style: tokens.eyebrow),
+        Text('0.1.0', style: tokens.eyebrow),
         const Spacer(),
         _IconToggle(
+          tooltip: 'GitHub',
+          icon: FontAwesomeIcons.github,
+          onTap: () => unawaited(_openExternal(_githubUrl)),
+        ),
+        _IconToggle(
+          tooltip: 'X / Twitter',
+          icon: FontAwesomeIcons.xTwitter,
+          onTap: () => unawaited(_openExternal(_twitterUrl)),
+        ),
+        _IconToggle(
+          tooltip: isLight ? 'Dark mode' : 'Light mode',
           icon: isLight ? LucideIcons.moon : LucideIcons.sun,
           onTap: onToggleTheme,
         ),
@@ -244,9 +263,18 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-class _IconToggle extends StatefulWidget {
-  const _IconToggle({required this.icon, required this.onTap});
+Future<void> _openExternal(String url) async {
+  await openExternalLink(url);
+}
 
+class _IconToggle extends StatefulWidget {
+  const _IconToggle({
+    required this.tooltip,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String tooltip;
   final IconData icon;
   final VoidCallback onTap;
 
@@ -264,17 +292,20 @@ class _IconToggleState extends State<_IconToggle> {
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.onTap,
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: Center(
-            child: Icon(
-              widget.icon,
-              size: 17,
-              color: _hovered ? tokens.text : tokens.muted,
+      child: Tooltip(
+        message: widget.tooltip,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTap,
+          child: SizedBox(
+            width: 36,
+            height: 36,
+            child: Center(
+              child: Icon(
+                widget.icon,
+                size: 17,
+                color: _hovered ? tokens.text : tokens.muted,
+              ),
             ),
           ),
         ),
@@ -295,7 +326,7 @@ class _HeroHeader extends StatelessWidget {
         final isWide = constraints.maxWidth >= 760;
         final titleSize = isWide ? 116.0 : 64.0;
 
-        final eyebrow = Text('MATHEMATICAL MOTION', style: tokens.eyebrow);
+        final eyebrow = Text('A FLUTTER PACKAGE', style: tokens.eyebrow);
         final title = Text(
           'Curves drawn\nfrom formulae.',
           style: tokens.title.copyWith(fontSize: titleSize),
@@ -391,7 +422,7 @@ class _CollectionRule extends StatelessWidget {
           Expanded(child: Container(height: 1, color: tokens.border)),
           const SizedBox(width: 16),
           Text(
-            '${_presets.length.toString().padLeft(2, '0')} SPECIMENS',
+            '${(_presets.length - 1).toString().padLeft(2, '0')} PRESETS',
             style: tokens.eyebrow,
           ),
         ],
@@ -410,9 +441,9 @@ class _Colophon extends StatelessWidget {
       padding: const EdgeInsets.only(top: 4, bottom: 36),
       child: Row(
         children: [
-          Text('SET IN FRAUNCES & INTER TIGHT', style: tokens.eyebrow),
+          Text('INSPIRED BY PAIDAX01', style: tokens.eyebrow),
           const Spacer(),
-          Text('© MATH CURVE LOADERS', style: tokens.eyebrow),
+          Text('CODYWHUNT', style: tokens.eyebrow),
         ],
       ),
     );

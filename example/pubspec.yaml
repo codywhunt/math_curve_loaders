@@ -4,14 +4,16 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.10.1
+  sdk: ">=3.8.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  font_awesome_flutter: ^10.12.0
   lucide_icons_flutter: ^3.1.12
   math_curve_loaders:
     path: ../
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

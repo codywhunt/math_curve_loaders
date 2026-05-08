@@ -51,6 +51,22 @@ void main() {
     expect(_loaderCustomPaintFinder, findsOneWidget);
   });
 
+  testWidgets('passes open custom paths to the painter', (tester) async {
+    await tester.pumpWidget(
+      _TestApp(
+        child: MathCurveLoader.custom(
+          closedPath: false,
+          curve: (progress, detailScale) => Offset(20 + progress * 60, 50),
+        ),
+      ),
+    );
+
+    final customPaint = tester.widget<CustomPaint>(_loaderCustomPaintFinder);
+    final painter = customPaint.painter as MathCurvePainter;
+
+    expect(painter.closedPath, isFalse);
+  });
+
   testWidgets('uses a static painter animation when reduced motion is enabled',
       (
     tester,
