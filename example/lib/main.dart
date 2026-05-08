@@ -94,36 +94,48 @@ class _GalleryPage extends StatelessWidget {
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(20, 0, 20, 48),
-                    sliver: SliverLayoutBuilder(
-                      builder: (context, constraints) {
-                        final width = constraints.crossAxisExtent;
-                        final columns = width >= 1040
-                            ? 3
-                            : width >= 720
-                            ? 2
-                            : 1;
+                    sliver: SliverToBoxAdapter(
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 1080),
+                          child: LayoutBuilder(
+                            builder: (context, constraints) {
+                              final width = constraints.maxWidth;
+                              final columns = width >= 1040
+                                  ? 3
+                                  : width >= 720
+                                  ? 2
+                                  : 1;
 
-                        return SliverGrid.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: columns,
-                                mainAxisSpacing: 14,
-                                crossAxisSpacing: 14,
-                                mainAxisExtent: 292,
-                              ),
-                          itemCount: _presets.length,
-                          itemBuilder: (context, index) {
-                            final preset = _presets[index];
-                            return _RevealItem(
-                              index: index,
-                              child: _LoaderCard(
-                                preset: preset,
-                                onTap: () => _openPresetViewer(context, preset),
-                              ),
-                            );
-                          },
-                        );
-                      },
+                              return GridView.builder(
+                                padding: EdgeInsets.zero,
+                                primary: false,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: columns,
+                                      mainAxisSpacing: 14,
+                                      crossAxisSpacing: 14,
+                                      mainAxisExtent: 292,
+                                    ),
+                                itemCount: _presets.length,
+                                itemBuilder: (context, index) {
+                                  final preset = _presets[index];
+                                  return _RevealItem(
+                                    index: index,
+                                    child: _LoaderCard(
+                                      preset: preset,
+                                      onTap: () =>
+                                          _openPresetViewer(context, preset),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
