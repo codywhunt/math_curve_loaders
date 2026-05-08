@@ -1,39 +1,102 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Math Curve Loaders
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+Animated Flutter loading indicators drawn from parametric mathematical curves.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+`math_curve_loaders` gives you lightweight, dependency-free loaders with a
+simple widget API and a small catalog of curve families: rose curves, Lissajous
+curves, cardioids, hypotrochoids, epicycloids, Cassini ovals, lemniscates,
+spirals, and Fourier-style flows.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+- Named constructors for nine curated mathematical loader presets.
+- A `MathCurveLoader.custom` escape hatch for your own normalized curve builder.
+- Theme-aware color defaults using `ColorScheme.primary`.
+- Shared visual controls through `MathCurveLoaderStyle`.
+- Reduced-motion support through `MediaQuery.disableAnimations`.
+- Progress semantics by default, with an opt-out for decorative loaders.
+- No runtime dependencies beyond Flutter.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Add the package to your app:
+
+```yaml
+dependencies:
+  math_curve_loaders:
+    git:
+      url: https://github.com/codywhunt/math_curve_loaders.git
+```
+
+The repository is private while the package is being prepared for pub.dev.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
 ```dart
-const like = 'sample';
+import 'package:flutter/material.dart';
+import 'package:math_curve_loaders/math_curve_loaders.dart';
+
+class LoadingState extends StatelessWidget {
+  const LoadingState({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: MathCurveLoader.rose(
+        size: 96,
+        color: Theme.of(context).colorScheme.primary,
+      ),
+    );
+  }
+}
 ```
 
-## Additional information
+Customize the shared visual style:
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+MathCurveLoader.lissajous(
+  size: 112,
+  duration: const Duration(milliseconds: 3600),
+  style: const MathCurveLoaderStyle(
+    particleCount: 80,
+    trailSpan: 0.44,
+    strokeWidth: 4,
+    guideOpacity: 0.08,
+  ),
+)
+```
+
+Bring your own curve when you want a custom motion signature:
+
+```dart
+import 'dart:math' as math;
+
+MathCurveLoader.custom(
+  curve: (progress, detailScale) {
+    final angle = progress * math.pi * 2;
+    final radius = 24 + detailScale * 5;
+    return Offset(
+      50 + math.cos(angle) * radius,
+      50 + math.sin(angle * 2) * radius * 0.6,
+    );
+  },
+)
+```
+
+## Presets
+
+- `MathCurveLoader.rose`
+- `MathCurveLoader.lissajous`
+- `MathCurveLoader.cardioid`
+- `MathCurveLoader.hypotrochoid`
+- `MathCurveLoader.epicycloid`
+- `MathCurveLoader.cassiniOval`
+- `MathCurveLoader.lemniscate`
+- `MathCurveLoader.spiral`
+- `MathCurveLoader.fourierFlow`
+
+## Inspiration
+
+This package is a clean-room Flutter implementation inspired by the idea of
+mathematical curve loading animations. It does not copy code or assets from the
+reference gallery.

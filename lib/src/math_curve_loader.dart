@@ -1,68 +1,298 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 
-/// Calculates a point on a normalized 100x100 curve canvas.
-typedef MathCurvePointBuilder =
-    Offset Function(double progress, double detailScale);
+import 'math_curve_curves.dart';
+import 'math_curve_loader_style.dart';
+import 'math_curve_painter.dart';
 
-/// Preset parametric curves that work well as loading animations.
-class MathLoaderCurves {
-  const MathLoaderCurves._();
+/// An animated loading indicator drawn from a parametric math curve.
+class MathCurveLoader extends StatefulWidget {
+  const MathCurveLoader._({
+    super.key,
+    required this.curve,
+    this.size = 96,
+    this.color,
+    this.duration = const Duration(milliseconds: 4600),
+    this.style = MathCurveLoaderStyle.defaults,
+    this.semanticLabel = 'Loading',
+    this.excludeFromSemantics = false,
+    this.animate = true,
+    this.reverse = false,
+    this.respectReducedMotion = true,
+  })  : assert(size > 0),
+        assert(duration > Duration.zero);
 
-  /// A soft rose-style orbit inspired by mathematical flower curves.
-  static MathCurvePointBuilder roseOrbit({
+  /// Creates a loader from a rose curve.
+  factory MathCurveLoader.rose({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
     int petals = 7,
-    double baseRadius = 7,
-    double detailAmplitude = 3,
-    double scale = 3.9,
+    double radius = 27,
+    double amplitude = 5.5,
   }) {
-    return (progress, detailScale) {
-      final t = progress * math.pi * 2;
-      final x =
-          baseRadius * math.cos(t) -
-          detailAmplitude * detailScale * math.cos(petals * t);
-      final y =
-          baseRadius * math.sin(t) -
-          detailAmplitude * detailScale * math.sin(petals * t);
-
-      return Offset(50 + x * scale, 50 + y * scale);
-    };
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.rose(
+        petals: petals,
+        radius: radius,
+        amplitude: amplitude,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
   }
 
-  /// A looping Lissajous curve with a calm figure-eight feel.
-  static MathCurvePointBuilder lissajous({
+  /// Creates a loader from a Lissajous curve.
+  factory MathCurveLoader.lissajous({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
     double xFrequency = 3,
     double yFrequency = 2,
-    double phase = math.pi / 2,
+    double phase = 1.5707963267948966,
     double radius = 28,
   }) {
-    return (progress, detailScale) {
-      final t = progress * math.pi * 2;
-      final pulse = 0.9 + detailScale * 0.16;
-
-      return Offset(
-        50 + math.sin(xFrequency * t + phase) * radius * pulse,
-        50 + math.sin(yFrequency * t) * radius * pulse,
-      );
-    };
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.lissajous(
+        xFrequency: xFrequency,
+        yFrequency: yFrequency,
+        phase: phase,
+        radius: radius,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
   }
 
-  /// A small cardioid that gently breathes as it loops.
-  static MathCurvePointBuilder cardioid({
-    double radius = 18,
-    double scale = 1.05,
+  /// Creates a loader from a cardioid.
+  factory MathCurveLoader.cardioid({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double radius = 17,
+    double scale = 1.08,
   }) {
-    return (progress, detailScale) {
-      final t = progress * math.pi * 2;
-      final r = radius * (1 - math.sin(t)) * (0.86 + detailScale * 0.22);
-
-      return Offset(50 + math.cos(t) * r * scale, 54 + math.sin(t) * r * scale);
-    };
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.cardioid(radius: radius, scale: scale),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
   }
 
-  /// A Fourier-style curve with several harmonics mixed together.
-  static MathCurvePointBuilder fourierFlow({
+  /// Creates a loader from a hypotrochoid.
+  factory MathCurveLoader.hypotrochoid({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double outerRadius = 26,
+    double innerRadius = 7,
+    double distance = 18,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.hypotrochoid(
+        outerRadius: outerRadius,
+        innerRadius: innerRadius,
+        distance: distance,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from an epicycloid.
+  factory MathCurveLoader.epicycloid({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double outerRadius = 13,
+    double innerRadius = 5.2,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.epicycloid(
+        outerRadius: outerRadius,
+        innerRadius: innerRadius,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a Cassini oval.
+  factory MathCurveLoader.cassiniOval({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double radius = 28,
+    double pinch = 0.62,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.cassiniOval(radius: radius, pinch: pinch),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a lemniscate.
+  factory MathCurveLoader.lemniscate({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double width = 34,
+    double height = 22,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.lemniscate(width: width, height: height),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a breathing spiral.
+  factory MathCurveLoader.spiral({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+    double turns = 2.6,
+    double radius = 31,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.spiral(turns: turns, radius: radius),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
+
+  /// Creates a loader from a Fourier-style harmonic flow.
+  factory MathCurveLoader.fourierFlow({
+    Key? key,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
     double x1 = 17,
     double x3 = 7.5,
     double x5 = 3.2,
@@ -70,39 +300,56 @@ class MathLoaderCurves {
     double y2 = 8.2,
     double y4 = 4.2,
   }) {
-    return (progress, detailScale) {
-      final t = progress * math.pi * 2;
-      final mix = 1 + detailScale * 0.16;
-      final x =
-          x1 * math.cos(t) +
-          x3 * math.cos(3 * t + 0.6 * mix) +
-          x5 * math.sin(5 * t - 0.4);
-      final y =
-          y1 * math.sin(t) +
-          y2 * math.sin(2 * t + 0.25) -
-          y4 * math.cos(4 * t - 0.5 * mix);
-
-      return Offset(50 + x, 50 + y);
-    };
+    return MathCurveLoader._(
+      key: key,
+      curve: MathLoaderCurves.fourierFlow(
+        x1: x1,
+        x3: x3,
+        x5: x5,
+        y1: y1,
+        y2: y2,
+        y4: y4,
+      ),
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
   }
-}
 
-/// An animated loading indicator drawn from a parametric math curve.
-class MathCurveLoader extends StatefulWidget {
-  const MathCurveLoader({
-    super.key,
-    required this.curve,
-    this.size = 96,
-    this.color,
-    this.particleCount = 64,
-    this.trailSpan = 0.38,
-    this.strokeWidth = 4.8,
-    this.duration = const Duration(milliseconds: 4600),
-    this.semanticLabel = 'Loading',
-  }) : assert(size > 0),
-       assert(particleCount > 1),
-       assert(trailSpan > 0 && trailSpan <= 1),
-       assert(strokeWidth > 0);
+  /// Creates a loader from a custom normalized 100x100 curve builder.
+  factory MathCurveLoader.custom({
+    Key? key,
+    required MathCurvePointBuilder curve,
+    double size = 96,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 4600),
+    MathCurveLoaderStyle style = MathCurveLoaderStyle.defaults,
+    String semanticLabel = 'Loading',
+    bool excludeFromSemantics = false,
+    bool animate = true,
+    bool reverse = false,
+    bool respectReducedMotion = true,
+  }) {
+    return MathCurveLoader._(
+      key: key,
+      curve: curve,
+      size: size,
+      color: color,
+      duration: duration,
+      style: style,
+      semanticLabel: semanticLabel,
+      excludeFromSemantics: excludeFromSemantics,
+      animate: animate,
+      reverse: reverse,
+      respectReducedMotion: respectReducedMotion,
+    );
+  }
 
   /// The parametric curve used by the loader.
   final MathCurvePointBuilder curve;
@@ -113,20 +360,26 @@ class MathCurveLoader extends StatefulWidget {
   /// The loader color. Defaults to [ColorScheme.primary].
   final Color? color;
 
-  /// Number of particles in the moving trail.
-  final int particleCount;
-
-  /// How far back the particle trail stretches around the curve.
-  final double trailSpan;
-
-  /// Width of the faint curve guide.
-  final double strokeWidth;
-
   /// Duration for one full trip around the curve.
   final Duration duration;
 
+  /// Shared visual controls for the loader.
+  final MathCurveLoaderStyle style;
+
   /// Accessibility label for the progress indicator.
   final String semanticLabel;
+
+  /// Whether to remove this loader from the semantics tree.
+  final bool excludeFromSemantics;
+
+  /// Whether the loader should animate.
+  final bool animate;
+
+  /// Whether the animated trail should move backward.
+  final bool reverse;
+
+  /// Whether to honor [MediaQueryData.disableAnimations].
+  final bool respectReducedMotion;
 
   @override
   State<MathCurveLoader> createState() => _MathCurveLoaderState();
@@ -134,10 +387,21 @@ class MathCurveLoader extends StatefulWidget {
 
 class _MathCurveLoaderState extends State<MathCurveLoader>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: widget.duration,
-  )..repeat();
+  late final AnimationController _controller;
+
+  bool _wasAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: widget.duration);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncAnimation();
+  }
 
   @override
   void didUpdateWidget(covariant MathCurveLoader oldWidget) {
@@ -145,8 +409,12 @@ class _MathCurveLoaderState extends State<MathCurveLoader>
 
     if (oldWidget.duration != widget.duration) {
       _controller.duration = widget.duration;
-      _controller.repeat();
+      if (_wasAnimating) {
+        _controller.repeat();
+      }
     }
+
+    _syncAnimation();
   }
 
   @override
@@ -158,103 +426,61 @@ class _MathCurveLoaderState extends State<MathCurveLoader>
   @override
   Widget build(BuildContext context) {
     final color = widget.color ?? Theme.of(context).colorScheme.primary;
+    final shouldAnimate = _shouldAnimate(context);
+    final progress = shouldAnimate
+        ? widget.reverse
+            ? ReverseAnimation(_controller)
+            : _controller
+        : MathCurvePainter.staticAnimation(reverse: widget.reverse);
 
-    return Semantics(
-      label: widget.semanticLabel,
-      child: SizedBox.square(
-        dimension: widget.size,
-        child: CustomPaint(
-          painter: _MathCurveLoaderPainter(
-            animation: _controller,
-            curve: widget.curve,
-            color: color,
-            particleCount: widget.particleCount,
-            trailSpan: widget.trailSpan,
-            strokeWidth: widget.strokeWidth,
-          ),
+    final loader = SizedBox.square(
+      dimension: widget.size,
+      child: CustomPaint(
+        painter: MathCurvePainter(
+          progress: progress,
+          curve: widget.curve,
+          color: color,
+          style: widget.style,
         ),
       ),
     );
-  }
-}
 
-class _MathCurveLoaderPainter extends CustomPainter {
-  _MathCurveLoaderPainter({
-    required this.animation,
-    required this.curve,
-    required this.color,
-    required this.particleCount,
-    required this.trailSpan,
-    required this.strokeWidth,
-  }) : super(repaint: animation);
-
-  final Animation<double> animation;
-  final MathCurvePointBuilder curve;
-  final Color color;
-  final int particleCount;
-  final double trailSpan;
-  final double strokeWidth;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final side = math.min(size.width, size.height);
-    final scale = side / 100;
-    final origin = Offset((size.width - side) / 2, (size.height - side) / 2);
-
-    Offset mapPoint(Offset point) {
-      return origin + Offset(point.dx * scale, point.dy * scale);
+    if (widget.excludeFromSemantics) {
+      return ExcludeSemantics(child: loader);
     }
 
-    final detailScale = _detailScale(animation.value);
-    final path = Path();
-
-    for (var index = 0; index <= 360; index++) {
-      final point = mapPoint(curve(index / 360, detailScale));
-      if (index == 0) {
-        path.moveTo(point.dx, point.dy);
-      } else {
-        path.lineTo(point.dx, point.dy);
-      }
-    }
-
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = color.withValues(alpha: 0.10)
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..strokeJoin = StrokeJoin.round
-        ..strokeWidth = strokeWidth * scale,
+    return Semantics(
+      label: widget.semanticLabel,
+      value: 'In progress',
+      liveRegion: true,
+      child: loader,
     );
+  }
 
-    for (var index = 0; index < particleCount; index++) {
-      final tailOffset = index / (particleCount - 1);
-      final progress = _normalize(animation.value - tailOffset * trailSpan);
-      final fade = math.pow(1 - tailOffset, 0.56).toDouble();
-      final point = mapPoint(curve(progress, detailScale));
+  void _syncAnimation() {
+    final shouldAnimate = _shouldAnimate(context);
+    if (shouldAnimate == _wasAnimating) {
+      return;
+    }
 
-      canvas.drawCircle(
-        point,
-        (0.9 + fade * 2.7) * scale,
-        Paint()..color = color.withValues(alpha: 0.04 + fade * 0.96),
-      );
+    _wasAnimating = shouldAnimate;
+
+    if (shouldAnimate) {
+      _controller.repeat();
+    } else {
+      _controller.stop();
     }
   }
 
-  @override
-  bool shouldRepaint(covariant _MathCurveLoaderPainter oldDelegate) {
-    return oldDelegate.animation != animation ||
-        oldDelegate.curve != curve ||
-        oldDelegate.color != color ||
-        oldDelegate.particleCount != particleCount ||
-        oldDelegate.trailSpan != trailSpan ||
-        oldDelegate.strokeWidth != strokeWidth;
-  }
+  bool _shouldAnimate(BuildContext context) {
+    if (!widget.animate) {
+      return false;
+    }
 
-  double _detailScale(double progress) {
-    final pulseAngle = progress * math.pi * 2;
-    return 0.52 + ((math.sin(pulseAngle + 0.55) + 1) / 2) * 0.48;
-  }
+    if (!widget.respectReducedMotion) {
+      return true;
+    }
 
-  double _normalize(double progress) => ((progress % 1) + 1) % 1;
+    return !(MediaQuery.maybeDisableAnimationsOf(context) ?? false);
+  }
 }
