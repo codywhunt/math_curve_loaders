@@ -1,0 +1,21 @@
+name: math_curve_loaders_example
+description: Manual visual tester for the math_curve_loaders Flutter package.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lucide_icons_flutter: ^3.1.12
+  math_curve_loaders:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
