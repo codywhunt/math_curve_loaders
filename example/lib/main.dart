@@ -572,6 +572,7 @@ class _PresetViewerState extends State<_PresetViewer> {
                     settings: settings,
                   );
                   final controls = _ControlsPanel(
+                    preset: widget.preset,
                     settings: settings,
                     onSettingsChanged: (settings) {
                       setState(() => _settings = settings);
@@ -678,11 +679,13 @@ class _ViewerPreview extends StatelessWidget {
 
 class _ControlsPanel extends StatelessWidget {
   const _ControlsPanel({
+    required this.preset,
     required this.settings,
     required this.onSettingsChanged,
     required this.onReset,
   });
 
+  final _LoaderPreset preset;
   final _LoaderSettings settings;
   final ValueChanged<_LoaderSettings> onSettingsChanged;
   final VoidCallback onReset;
@@ -715,89 +718,139 @@ class _ControlsPanel extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 28),
-          _ControlStack(
-            children: [
-              _NumberControl(
-                label: 'SIZE',
-                value: settings.size,
-                min: 72,
-                max: 220,
-                divisions: 37,
-                suffix: 'px',
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(size: value)),
-              ),
-              _NumberControl(
-                label: 'DURATION',
-                value: settings.durationMs.toDouble(),
-                min: 1200,
-                max: 7200,
-                divisions: 30,
-                suffix: 'ms',
-                onChanged: (value) => onSettingsChanged(
-                  settings.copyWith(durationMs: value.round()),
+          _ControlSection(
+            title: 'CURVE',
+            child: _ControlStack(
+              children: [
+                for (final control in preset.curveControls)
+                  _NumberControl(
+                    label: control.label,
+                    value: settings.curveValue(control),
+                    min: control.min,
+                    max: control.max,
+                    divisions: control.divisions,
+                    suffix: '',
+                    precision: control.precision,
+                    onChanged: (value) {
+                      final nextValue = control.isInteger
+                          ? value.roundToDouble()
+                          : value;
+                      onSettingsChanged(
+                        settings.copyWithCurveValue(control.key, nextValue),
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 30),
+          _ControlSection(
+            title: 'STYLE',
+            child: _ControlStack(
+              children: [
+                _NumberControl(
+                  label: 'SIZE',
+                  value: settings.size,
+                  min: 72,
+                  max: 220,
+                  divisions: 37,
+                  suffix: 'px',
+                  onChanged: (value) =>
+                      onSettingsChanged(settings.copyWith(size: value)),
                 ),
-              ),
-              _NumberControl(
-                label: 'PARTICLES',
-                value: settings.particleCount.toDouble(),
-                min: 16,
-                max: 120,
-                divisions: 26,
-                suffix: '',
-                onChanged: (value) => onSettingsChanged(
-                  settings.copyWith(particleCount: value.round()),
+                _NumberControl(
+                  label: 'DURATION',
+                  value: settings.durationMs.toDouble(),
+                  min: 1200,
+                  max: 7200,
+                  divisions: 30,
+                  suffix: 'ms',
+                  onChanged: (value) => onSettingsChanged(
+                    settings.copyWith(durationMs: value.round()),
+                  ),
                 ),
-              ),
-              _NumberControl(
-                label: 'TRAIL SPAN',
-                value: settings.trailSpan,
-                min: 0.12,
-                max: 0.90,
-                divisions: 39,
-                suffix: '',
-                precision: 2,
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(trailSpan: value)),
-              ),
-              _NumberControl(
-                label: 'STROKE',
-                value: settings.strokeWidth,
-                min: 1,
-                max: 9,
-                divisions: 32,
-                suffix: '',
-                precision: 1,
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(strokeWidth: value)),
-              ),
-              _ColorControl(
-                selected: settings.color,
-                onChanged: (color) =>
-                    onSettingsChanged(settings.copyWith(color: color)),
-              ),
-              _ToggleControl(
-                label: 'ANIMATE',
-                value: settings.animate,
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(animate: value)),
-              ),
-              _ToggleControl(
-                label: 'REVERSE',
-                value: settings.reverse,
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(reverse: value)),
-              ),
-              _ToggleControl(
-                label: 'REDUCED MOTION',
-                value: settings.reducedMotion,
-                onChanged: (value) =>
-                    onSettingsChanged(settings.copyWith(reducedMotion: value)),
-              ),
-            ],
+                _NumberControl(
+                  label: 'PARTICLES',
+                  value: settings.particleCount.toDouble(),
+                  min: 16,
+                  max: 120,
+                  divisions: 26,
+                  suffix: '',
+                  onChanged: (value) => onSettingsChanged(
+                    settings.copyWith(particleCount: value.round()),
+                  ),
+                ),
+                _NumberControl(
+                  label: 'TRAIL SPAN',
+                  value: settings.trailSpan,
+                  min: 0.12,
+                  max: 0.90,
+                  divisions: 39,
+                  suffix: '',
+                  precision: 2,
+                  onChanged: (value) =>
+                      onSettingsChanged(settings.copyWith(trailSpan: value)),
+                ),
+                _NumberControl(
+                  label: 'STROKE',
+                  value: settings.strokeWidth,
+                  min: 1,
+                  max: 9,
+                  divisions: 32,
+                  suffix: '',
+                  precision: 1,
+                  onChanged: (value) =>
+                      onSettingsChanged(settings.copyWith(strokeWidth: value)),
+                ),
+                _ColorControl(
+                  selected: settings.color,
+                  onChanged: (color) =>
+                      onSettingsChanged(settings.copyWith(color: color)),
+                ),
+                _ToggleControl(
+                  label: 'ANIMATE',
+                  value: settings.animate,
+                  onChanged: (value) =>
+                      onSettingsChanged(settings.copyWith(animate: value)),
+                ),
+                _ToggleControl(
+                  label: 'REVERSE',
+                  value: settings.reverse,
+                  onChanged: (value) =>
+                      onSettingsChanged(settings.copyWith(reverse: value)),
+                ),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ControlSection extends StatelessWidget {
+  const _ControlSection({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = _TokensScope.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(title, style: tokens.sectionTitle),
+            const SizedBox(width: 14),
+            Expanded(child: Container(height: 1, color: tokens.border)),
+          ],
+        ),
+        const SizedBox(height: 20),
+        child,
+      ],
     );
   }
 }
@@ -1178,6 +1231,9 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        petals: _curveSettingInt(preset, settings, 'petals'),
+        radius: _curveSetting(preset, settings, 'radius'),
+        amplitude: _curveSetting(preset, settings, 'amplitude'),
       );
     case 'lissajous':
       loader = MathCurveLoader.lissajous(
@@ -1187,6 +1243,10 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        xFrequency: _curveSetting(preset, settings, 'xFrequency'),
+        yFrequency: _curveSetting(preset, settings, 'yFrequency'),
+        phase: _curveSetting(preset, settings, 'phase'),
+        radius: _curveSetting(preset, settings, 'radius'),
       );
     case 'cardioid':
       loader = MathCurveLoader.cardioid(
@@ -1196,6 +1256,8 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        radius: _curveSetting(preset, settings, 'radius'),
+        scale: _curveSetting(preset, settings, 'scale'),
       );
     case 'hypotrochoid':
       loader = MathCurveLoader.hypotrochoid(
@@ -1205,6 +1267,9 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        outerRadius: _curveSetting(preset, settings, 'outerRadius'),
+        innerRadius: _curveSetting(preset, settings, 'innerRadius'),
+        distance: _curveSetting(preset, settings, 'distance'),
       );
     case 'epicycloid':
       loader = MathCurveLoader.epicycloid(
@@ -1214,6 +1279,8 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        outerRadius: _curveSetting(preset, settings, 'outerRadius'),
+        innerRadius: _curveSetting(preset, settings, 'innerRadius'),
       );
     case 'cassiniOval':
       loader = MathCurveLoader.cassiniOval(
@@ -1223,6 +1290,8 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        radius: _curveSetting(preset, settings, 'radius'),
+        pinch: _curveSetting(preset, settings, 'pinch'),
       );
     case 'lemniscate':
       loader = MathCurveLoader.lemniscate(
@@ -1232,6 +1301,8 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        width: _curveSetting(preset, settings, 'width'),
+        height: _curveSetting(preset, settings, 'height'),
       );
     case 'spiral':
       loader = MathCurveLoader.spiral(
@@ -1241,6 +1312,8 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        turns: _curveSetting(preset, settings, 'turns'),
+        radius: _curveSetting(preset, settings, 'radius'),
       );
     case 'fourierFlow':
       loader = MathCurveLoader.fourierFlow(
@@ -1250,6 +1323,12 @@ Widget _buildLoader(
         style: style,
         animate: settings.animate,
         reverse: settings.reverse,
+        x1: _curveSetting(preset, settings, 'x1'),
+        x3: _curveSetting(preset, settings, 'x3'),
+        x5: _curveSetting(preset, settings, 'x5'),
+        y1: _curveSetting(preset, settings, 'y1'),
+        y2: _curveSetting(preset, settings, 'y2'),
+        y4: _curveSetting(preset, settings, 'y4'),
       );
     default:
       loader = MathCurveLoader.rose(
@@ -1270,12 +1349,13 @@ Widget _buildLoader(
 
 String _snippetFor(_LoaderPreset preset, _LoaderSettings settings) {
   final colorName = _colorName(settings.color);
+  final curveLines = _curveSnippetLines(preset, settings);
   return '''
 MathCurveLoader.${preset.id}(
   size: ${settings.size.round()},
   color: $colorName,
   duration: const Duration(milliseconds: ${settings.durationMs}),
-  style: const MathCurveLoaderStyle(
+$curveLines  style: const MathCurveLoaderStyle(
     particleCount: ${settings.particleCount},
     trailSpan: ${settings.trailSpan.toStringAsFixed(2)},
     strokeWidth: ${settings.strokeWidth.toStringAsFixed(1)},
@@ -1283,6 +1363,35 @@ MathCurveLoader.${preset.id}(
   animate: ${settings.animate},
   reverse: ${settings.reverse},
 )''';
+}
+
+String _curveSnippetLines(_LoaderPreset preset, _LoaderSettings settings) {
+  return preset.curveControls.map((control) {
+    final value = settings.curveValue(control);
+    final literal = control.isInteger
+        ? value.round().toString()
+        : value.toStringAsFixed(control.precision);
+    return '  ${control.key}: $literal,\n';
+  }).join();
+}
+
+double _curveSetting(
+  _LoaderPreset preset,
+  _LoaderSettings settings,
+  String key,
+) {
+  final control = preset.curveControls.firstWhere(
+    (control) => control.key == key,
+  );
+  return settings.curveValue(control);
+}
+
+int _curveSettingInt(
+  _LoaderPreset preset,
+  _LoaderSettings settings,
+  String key,
+) {
+  return _curveSetting(preset, settings, key).round();
 }
 
 String _colorName(Color color) {
@@ -1304,6 +1413,7 @@ class _LoaderSettings {
     required this.animate,
     required this.reverse,
     required this.reducedMotion,
+    required this.curveValues,
   });
 
   factory _LoaderSettings.defaults({required Color color}) {
@@ -1317,6 +1427,7 @@ class _LoaderSettings {
       animate: true,
       reverse: false,
       reducedMotion: false,
+      curveValues: const {},
     );
   }
 
@@ -1329,6 +1440,15 @@ class _LoaderSettings {
   final bool animate;
   final bool reverse;
   final bool reducedMotion;
+  final Map<String, double> curveValues;
+
+  double curveValue(_CurveControl control) {
+    return curveValues[control.key] ?? control.defaultValue;
+  }
+
+  _LoaderSettings copyWithCurveValue(String key, double value) {
+    return copyWith(curveValues: {...curveValues, key: value});
+  }
 
   _LoaderSettings copyWith({
     double? size,
@@ -1340,6 +1460,7 @@ class _LoaderSettings {
     bool? animate,
     bool? reverse,
     bool? reducedMotion,
+    Map<String, double>? curveValues,
   }) {
     return _LoaderSettings(
       size: size ?? this.size,
@@ -1351,8 +1472,31 @@ class _LoaderSettings {
       animate: animate ?? this.animate,
       reverse: reverse ?? this.reverse,
       reducedMotion: reducedMotion ?? this.reducedMotion,
+      curveValues: curveValues ?? this.curveValues,
     );
   }
+}
+
+class _CurveControl {
+  const _CurveControl({
+    required this.key,
+    required this.label,
+    required this.defaultValue,
+    required this.min,
+    required this.max,
+    required this.divisions,
+    this.precision = 1,
+    this.isInteger = false,
+  });
+
+  final String key;
+  final String label;
+  final double defaultValue;
+  final double min;
+  final double max;
+  final int divisions;
+  final int precision;
+  final bool isInteger;
 }
 
 class _LoaderPreset {
@@ -1363,6 +1507,7 @@ class _LoaderPreset {
     required this.description,
     required this.formulaNote,
     required this.color,
+    required this.curveControls,
   });
 
   final String id;
@@ -1371,6 +1516,7 @@ class _LoaderPreset {
   final String description;
   final String formulaNote;
   final Color color;
+  final List<_CurveControl> curveControls;
 }
 
 class _Swatch {
@@ -1402,6 +1548,34 @@ const _presets = [
     description: 'A floral orbit with a soft breathing radius.',
     formulaNote: 'A rose-style polar curve modulates radius with cos(k t).',
     color: _paperColor,
+    curveControls: [
+      _CurveControl(
+        key: 'petals',
+        label: 'PETALS',
+        defaultValue: 7,
+        min: 3,
+        max: 12,
+        divisions: 9,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 27,
+        min: 18,
+        max: 34,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'amplitude',
+        label: 'AMPLITUDE',
+        defaultValue: 5.5,
+        min: 0,
+        max: 10,
+        divisions: 20,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'lissajous',
@@ -1410,6 +1584,45 @@ const _presets = [
     description: 'Balanced sine waves weave a calm figure-eight motion.',
     formulaNote: 'Independent x/y sine frequencies create the crossing path.',
     color: Color(0xFF67E8F9),
+    curveControls: [
+      _CurveControl(
+        key: 'xFrequency',
+        label: 'X FREQ',
+        defaultValue: 3,
+        min: 1,
+        max: 6,
+        divisions: 5,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'yFrequency',
+        label: 'Y FREQ',
+        defaultValue: 2,
+        min: 1,
+        max: 6,
+        divisions: 5,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'phase',
+        label: 'PHASE',
+        defaultValue: 1.57,
+        min: 0,
+        max: 6.28,
+        divisions: 40,
+        precision: 2,
+      ),
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 28,
+        min: 18,
+        max: 34,
+        divisions: 32,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'cardioid',
@@ -1418,6 +1631,25 @@ const _presets = [
     description: 'A compact polar curve that folds inward as it loops.',
     formulaNote: 'A cardioid uses radius proportional to 1 − sin(t).',
     color: Color(0xFFFF7A90),
+    curveControls: [
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 17,
+        min: 10,
+        max: 24,
+        divisions: 28,
+      ),
+      _CurveControl(
+        key: 'scale',
+        label: 'SCALE',
+        defaultValue: 1.08,
+        min: 0.75,
+        max: 1.35,
+        divisions: 30,
+        precision: 2,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'hypotrochoid',
@@ -1426,6 +1658,32 @@ const _presets = [
     description: 'A spirograph-like path traced from inside a rolling circle.',
     formulaNote: 'A point inside a rolling circle creates lobed inner motion.',
     color: Color(0xFFF8C56B),
+    curveControls: [
+      _CurveControl(
+        key: 'outerRadius',
+        label: 'OUTER R',
+        defaultValue: 28,
+        min: 20,
+        max: 34,
+        divisions: 28,
+      ),
+      _CurveControl(
+        key: 'innerRadius',
+        label: 'INNER R',
+        defaultValue: 7,
+        min: 4,
+        max: 10,
+        divisions: 24,
+      ),
+      _CurveControl(
+        key: 'distance',
+        label: 'DISTANCE',
+        defaultValue: 18,
+        min: 8,
+        max: 24,
+        divisions: 32,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'epicycloid',
@@ -1434,6 +1692,24 @@ const _presets = [
     description: 'A brighter outer rolling curve with crisp petal turns.',
     formulaNote: 'A point outside a rolling circle traces the outer lobes.',
     color: Color(0xFFA7F46A),
+    curveControls: [
+      _CurveControl(
+        key: 'outerRadius',
+        label: 'OUTER R',
+        defaultValue: 15.6,
+        min: 10,
+        max: 22,
+        divisions: 30,
+      ),
+      _CurveControl(
+        key: 'innerRadius',
+        label: 'INNER R',
+        defaultValue: 5.2,
+        min: 3,
+        max: 8,
+        divisions: 25,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'cassiniOval',
@@ -1443,6 +1719,25 @@ const _presets = [
     formulaNote:
         'Cassini-style paths balance two focal distances into an oval.',
     color: Color(0xFFC4A5FF),
+    curveControls: [
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 28,
+        min: 18,
+        max: 36,
+        divisions: 36,
+      ),
+      _CurveControl(
+        key: 'pinch',
+        label: 'PINCH',
+        defaultValue: 0.62,
+        min: 0.20,
+        max: 1.20,
+        divisions: 40,
+        precision: 2,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'lemniscate',
@@ -1451,6 +1746,24 @@ const _presets = [
     description: 'A restrained infinity curve with a glassy central crossing.',
     formulaNote: 'A Bernoulli-style lemniscate folds around the center point.',
     color: _paperColor,
+    curveControls: [
+      _CurveControl(
+        key: 'width',
+        label: 'WIDTH',
+        defaultValue: 34,
+        min: 22,
+        max: 42,
+        divisions: 40,
+      ),
+      _CurveControl(
+        key: 'height',
+        label: 'HEIGHT',
+        defaultValue: 22,
+        min: 12,
+        max: 32,
+        divisions: 40,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'spiral',
@@ -1459,6 +1772,26 @@ const _presets = [
     description: 'A breathing radial wrap that contracts and unfurls.',
     formulaNote: 'A radial wave increases and decreases while the angle turns.',
     color: Color(0xFF67E8F9),
+    curveControls: [
+      _CurveControl(
+        key: 'turns',
+        label: 'TURNS',
+        defaultValue: 3,
+        min: 1,
+        max: 5,
+        divisions: 4,
+        precision: 0,
+        isInteger: true,
+      ),
+      _CurveControl(
+        key: 'radius',
+        label: 'RADIUS',
+        defaultValue: 31,
+        min: 18,
+        max: 38,
+        divisions: 40,
+      ),
+    ],
   ),
   _LoaderPreset(
     id: 'fourierFlow',
@@ -1467,6 +1800,56 @@ const _presets = [
     description: 'Layered harmonics drift into an organic closed path.',
     formulaNote: 'Several sine and cosine harmonics combine into one loop.',
     color: Color(0xFFF8C56B),
+    curveControls: [
+      _CurveControl(
+        key: 'x1',
+        label: 'X1',
+        defaultValue: 17,
+        min: 8,
+        max: 24,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'x3',
+        label: 'X3',
+        defaultValue: 7.5,
+        min: 0,
+        max: 14,
+        divisions: 28,
+      ),
+      _CurveControl(
+        key: 'x5',
+        label: 'X5',
+        defaultValue: 3.2,
+        min: 0,
+        max: 8,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'y1',
+        label: 'Y1',
+        defaultValue: 15,
+        min: 8,
+        max: 24,
+        divisions: 32,
+      ),
+      _CurveControl(
+        key: 'y2',
+        label: 'Y2',
+        defaultValue: 8.2,
+        min: 0,
+        max: 14,
+        divisions: 28,
+      ),
+      _CurveControl(
+        key: 'y4',
+        label: 'Y4',
+        defaultValue: 4.2,
+        min: 0,
+        max: 9,
+        divisions: 36,
+      ),
+    ],
   ),
 ];
 

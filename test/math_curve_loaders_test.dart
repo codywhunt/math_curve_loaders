@@ -146,6 +146,28 @@ void main() {
       }
     }
   });
+
+  test('default preset curves close smoothly at the animation seam', () {
+    final curves = <String, MathCurvePointBuilder>{
+      'rose': MathLoaderCurves.rose(),
+      'lissajous': MathLoaderCurves.lissajous(),
+      'cardioid': MathLoaderCurves.cardioid(),
+      'hypotrochoid': MathLoaderCurves.hypotrochoid(),
+      'epicycloid': MathLoaderCurves.epicycloid(),
+      'cassiniOval': MathLoaderCurves.cassiniOval(),
+      'lemniscate': MathLoaderCurves.lemniscate(),
+      'spiral': MathLoaderCurves.spiral(),
+      'fourierFlow': MathLoaderCurves.fourierFlow(),
+    };
+
+    for (final entry in curves.entries) {
+      final start = entry.value(0, 1);
+      final end = entry.value(1, 1);
+
+      expect((start - end).distance, lessThan(0.001),
+          reason: '${entry.key} seam distance');
+    }
+  });
 }
 
 final _loaderCustomPaintFinder = find.descendant(

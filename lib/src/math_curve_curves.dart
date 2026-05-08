@@ -75,7 +75,7 @@ class MathLoaderCurves {
 
   /// A hypotrochoid traced by a point inside a rolling circle.
   static MathCurvePointBuilder hypotrochoid({
-    double outerRadius = 26,
+    double outerRadius = 28,
     double innerRadius = 7,
     double distance = 18,
   }) {
@@ -98,7 +98,7 @@ class MathLoaderCurves {
 
   /// An epicycloid traced by a point outside a rolling circle.
   static MathCurvePointBuilder epicycloid({
-    double outerRadius = 13,
+    double outerRadius = 15.6,
     double innerRadius = 5.2,
   }) {
     assert(outerRadius > 0);
@@ -155,7 +155,7 @@ class MathLoaderCurves {
 
   /// A breathing spiral that wraps in and out around the center.
   static MathCurvePointBuilder spiral({
-    double turns = 2.6,
+    double turns = 3,
     double radius = 31,
   }) {
     assert(turns > 0);

@@ -135,7 +135,7 @@ class MathCurveLoader extends StatefulWidget {
     bool animate = true,
     bool reverse = false,
     bool respectReducedMotion = true,
-    double outerRadius = 26,
+    double outerRadius = 28,
     double innerRadius = 7,
     double distance = 18,
   }) {
@@ -170,7 +170,7 @@ class MathCurveLoader extends StatefulWidget {
     bool animate = true,
     bool reverse = false,
     bool respectReducedMotion = true,
-    double outerRadius = 13,
+    double outerRadius = 15.6,
     double innerRadius = 5.2,
   }) {
     return MathCurveLoader._(
@@ -263,7 +263,7 @@ class MathCurveLoader extends StatefulWidget {
     bool animate = true,
     bool reverse = false,
     bool respectReducedMotion = true,
-    double turns = 2.6,
+    double turns = 3,
     double radius = 31,
   }) {
     return MathCurveLoader._(
