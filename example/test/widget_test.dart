@@ -12,7 +12,7 @@ void main() {
 
     await tester.pumpWidget(const MathCurveExampleApp());
 
-    expect(find.text('Math Curve Loaders'), findsOneWidget);
+    expect(find.text('THE COLLECTION'), findsOneWidget);
     expect(find.text('Rose'), findsOneWidget);
     expect(find.text('Fourier Flow'), findsOneWidget);
   });
