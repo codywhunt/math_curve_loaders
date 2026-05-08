@@ -1,12 +1,12 @@
 {
-    "name": "math_curve_loaders_example",
-    "short_name": "math_curve_loaders_example",
+    "name": "Math Curve Loaders",
+    "short_name": "Curve Loaders",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
-    "orientation": "portrait-primary",
+    "background_color": "#F4F0E8",
+    "theme_color": "#F4F0E8",
+    "description": "A live gallery of elegant mathematical curve loaders for Flutter.",
+    "orientation": "any",
     "prefer_related_applications": false,
     "icons": [
         {
