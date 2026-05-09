@@ -326,7 +326,7 @@ class _HeroHeader extends StatelessWidget {
         final isWide = constraints.maxWidth >= 760;
         final titleSize = isWide ? 116.0 : 64.0;
 
-        final eyebrow = Text('A FLUTTER PACKAGE', style: tokens.eyebrow);
+        final eyebrow = const _HeroEyebrow();
         final title = Text(
           'Curves drawn\nfrom formulae.',
           style: tokens.title.copyWith(fontSize: titleSize),
@@ -376,6 +376,49 @@ class _HeroHeader extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+class _HeroEyebrow extends StatefulWidget {
+  const _HeroEyebrow();
+
+  @override
+  State<_HeroEyebrow> createState() => _HeroEyebrowState();
+}
+
+class _HeroEyebrowState extends State<_HeroEyebrow> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = _TokensScope.of(context);
+    final linkStyle = tokens.eyebrow.copyWith(
+      color: _hovered ? tokens.text : null,
+    );
+
+    return Text.rich(
+      TextSpan(
+        style: tokens.eyebrow,
+        children: [
+          const TextSpan(text: 'A FLUTTER PACKAGE INSPIRED BY '),
+          WidgetSpan(
+            alignment: PlaceholderAlignment.baseline,
+            baseline: TextBaseline.alphabetic,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) => setState(() => _hovered = true),
+              onExit: (_) => setState(() => _hovered = false),
+              child: GestureDetector(
+                onTap: () => _openExternal(
+                  'https://github.com/Paidax01/math-curve-loaders',
+                ),
+                child: Text('PAIDAX01', style: linkStyle),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

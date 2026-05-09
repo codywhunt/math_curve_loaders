@@ -2,7 +2,7 @@
 
 Animated Flutter loading indicators drawn from parametric mathematical curves.
 
-Live demo playground: https://codywhunt.github.io/math_curve_loaders/
+[Live demo playground](https://codywhunt.github.io/math_curve_loaders/)
 
 `math_curve_loaders` gives you lightweight, dependency-free loaders with a
 simple widget API and a small catalog of curve families: rose curves, Lissajous
@@ -133,4 +133,4 @@ Stack(
 ## Inspiration
 
 This package is a clean-room Flutter implementation inspired by the idea of
-mathematical curve loading animations by PAIDAX01.
+mathematical curve loading animations by [PAIDAX01](https://github.com/Paidax01/math-curve-loaders).
